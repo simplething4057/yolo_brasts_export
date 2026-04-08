@@ -1,0 +1,6 @@
+
+train: /content/dataset100/train/images
+val:   /content/dataset100/val/images
+
+nc: 1
+names: ['tumor']
