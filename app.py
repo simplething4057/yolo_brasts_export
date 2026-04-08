@@ -34,7 +34,7 @@ with col1:
 
     if uploaded:
         image = Image.open(uploaded).convert('RGB')
-        st.image(image, caption='업로드된 이미지', use_column_width=True)
+        st.image(image, caption='업로드된 이미지', use_container_width=True)
 
 with col2:
     st.subheader("탐지 결과")
@@ -50,7 +50,7 @@ with col2:
 
             result_img = results[0].plot()
             result_img = Image.fromarray(result_img[..., ::-1])
-            st.image(result_img, caption='탐지 결과', use_column_width=True)
+            st.image(result_img, caption='탐지 결과', use_container_width=True)
 
             boxes = results[0].boxes
 

@@ -27,7 +27,7 @@ with col1:
     
     if uploaded_file:
         image = Image.open(uploaded_file).convert('RGB')
-        st.image(image, caption="업로드된 원본 이미지", use_column_width=True)
+        st.image(image, caption="업로드된 원본 이미지", use_container_width=True)
         
         # 탐지 버튼
         detect_button = st.button("종양 탐지 시작 🚀", use_container_width=True)
@@ -45,7 +45,7 @@ with col2:
             res_plotted = results[0].plot()
             res_image = Image.fromarray(res_plotted[..., ::-1]) # BGR to RGB
             
-            st.image(res_image, caption="탐지 알고리즘 적용 결과", use_column_width=True)
+            st.image(res_image, caption="탐지 알고리즘 적용 결과", use_container_width=True)
             
             # 3. 데이터 추출 및 DB 저장
             summary = detector.get_summary(results)
@@ -82,9 +82,9 @@ with col2:
                 with st.expander("💾 데이터베이스 기록 상태"):
                     db_res = save_detection_result(
                         image_name=uploaded_file.name,
-                        confidence=top_conf,
-                        detected=True,
-                        bbox=summary["boxes"][0]["bbox"]
+                        detection_count=summary['count'],
+                        max_confidence=top_conf,
+                        details=summary['boxes']
                     )
                     if db_res:
                         st.info("📊 탐지 이력이 Supabase에 성공적으로 기록되었습니다.")
@@ -94,8 +94,9 @@ with col2:
                 st.info("🧐 종양이 탐지되지 않았습니다.")
                 save_detection_result(
                     image_name=uploaded_file.name,
-                    confidence=0.0,
-                    detected=False
+                    detection_count=0,
+                    max_confidence=0.0,
+                    details=[]
                 )
     else:
         st.info("왼쪽에서 이미지를 업로드하고 탐지 시작 버튼을 눌러주세요.")
