@@ -1,106 +1,59 @@
 import streamlit as st
-from ultralytics import YOLO
-from PIL import Image
-import numpy as np
+import os
 
+# 페이지 설정
 st.set_page_config(
-    page_title="뇌종양 학습 보조 서비스",
+    page_title="서비스 안내 - 뇌 MRI AI 학습 시스템",
     page_icon="🧠",
     layout="wide"
 )
 
-@st.cache_resource
-def load_model():
-    return YOLO('./weights/model_30p_ep50.pt')
+# [수직형 레이아웃 개편]
+# 1. 메인 타이틀
+st.title("🧠 뇌 MRI 신경교종 탐지 및 학습 보조 시스템")
+st.markdown("---")
 
-model = load_model()
+# 2. 서비스 소개
+st.header("1. 서비스 안내")
+st.write("""
+본 서비스는 **BraTS 2021** 의료 데이터셋을 학습한 인공지능(YOLOv8) 모델을 통해 
+뇌 MRI 속 **신경교종(Glioma)**의 세부 영역을 탐지하고, 최신 의학 지식인 **WHO CNS5(2021)** 표준을 
+학습할 수 있는 교육용 에듀테크 플랫폼입니다.
+""")
 
-# 사이드바
-st.sidebar.title("🧠 뇌종양 학습 보조")
-st.sidebar.markdown("BraTS 2021 기반 YOLOv8 탐지 모델")
+# 3. 기술적 제약 사항 (핵심 인지 사항)
+st.error("❗ **탐지 범위 기술적 제약 안내**\n\n"
+         "현재 탑재된 AI 모델은 **신경교종(Glioma)** 특화 모델입니다. \n"
+         "- **탐지 가능**: 괴사 핵심부(NCR), 부종 영역(ED), 조영증강 종양(ET)\n"
+         "- **탐지 불가**: 수막종, 뇌하수체 종양, 신경초종 등 (학습 자료로는 제공되나 AI가 자동으로 탐지하지는 않음)")
 
-# 메인 페이지
-st.title("뇌 MRI 종양 탐지 시스템")
-st.markdown("MRI 슬라이스 이미지를 업로드하면 종양 위치를 자동으로 탐지합니다.")
+# 4. 시각 자료 (가이드 이미지)
+sample_path = os.path.join("assets", "modalities_sample.png")
+if os.path.exists(sample_path):
+    st.image(sample_path, caption="AI가 분석하는 4가지 MRI 모달리티 특징", use_container_width=True)
 
-col1, col2 = st.columns(2)
+# 5. 상세 이용 방법
+st.header("2. 페이지별 이용 방법")
+with st.container():
+    st.markdown("""
+    - **🔍 MRI 탐지 & 분석**: MRI 사진을 업로드하여 실시간으로 종양의 위치와 신뢰도를 분석합니다. 결과는 DB에 자동 저장됩니다.
+    - **📚 학습자료**: 최신 WHO CNS5 개정 패러다임과 주요 7대 종양의 영상학적 특징을 상세히 공부합니다.
+    - **📊 데이터 대시보드**: 축적된 탐지 데이터를 통해 모델의 성능을 검증하고 통계를 확인합니다.
+    """)
 
-with col1:
-    st.subheader("이미지 업로드")
-    uploaded = st.file_uploader(
-        "MRI 슬라이스 이미지 (PNG, JPG)",
-        type=['png', 'jpg', 'jpeg']
-    )
+# 6. 빠른 이동 (하단 버튼)
+st.write("")
+st.header("3. 바로가기")
+c1, c2, c3 = st.columns(3)
+with c1:
+    if st.button("🔍 MRI 탐지 & 분석으로 이동", use_container_width=True):
+        st.switch_page("pages/1. MRI 탐지 & 분석.py")
+with c2:
+    if st.button("📚 학습자료로 이동", use_container_width=True):
+        st.switch_page("pages/2. 학습자료.py")
+with c3:
+    if st.button("📊 데이터 대시보드로 이동", use_container_width=True):
+        st.switch_page("pages/3. 데이터 대시보드.py")
 
-    if uploaded:
-        image = Image.open(uploaded).convert('RGB')
-        st.image(image, caption='업로드된 이미지', use_container_width=True)
-
-with col2:
-    st.subheader("탐지 결과")
-
-    if uploaded:
-        with st.spinner('탐지 중...'):
-            results = model.predict(
-                source=image,
-                conf=0.3,
-                save=False,
-                verbose=False
-            )
-
-            result_img = results[0].plot()
-            result_img = Image.fromarray(result_img[..., ::-1])
-            st.image(result_img, caption='탐지 결과', use_container_width=True)
-
-            boxes = results[0].boxes
-
-            if len(boxes) == 0:
-                st.info("종양이 탐지되지 않았습니다.")
-            else:
-                conf = boxes.conf[0].item()
-                st.success(f"종양 탐지됨")
-
-                # 수치 표시
-                m1, m2, m3 = st.columns(3)
-                m1.metric("신뢰도", f"{conf:.1%}")
-                m2.metric("탐지 개수", len(boxes))
-                m3.metric("모델", "YOLOv8s")
-
-# 학습 정보 섹션
 st.divider()
-st.subheader("종양 학습 정보")
-
-tab1, tab2, tab3 = st.tabs(["종양이란?", "MRI 모달리티", "탐지 지표"])
-
-with tab1:
-    st.markdown("""
-    **뇌종양(Brain Tumor)**이란 뇌 조직에서 비정상적인 세포가 증식하여
-    형성된 종괴를 말합니다.
-
-    - **교종(Glioma)**: 가장 흔한 악성 뇌종양
-    - **수막종(Meningioma)**: 뇌막에서 발생하는 종양
-    - **전이성 뇌종양**: 다른 부위 암이 뇌로 전이된 경우
-    """)
-
-with tab2:
-    st.markdown("""
-    **BraTS 데이터셋의 4가지 MRI 모달리티**
-
-    | 모달리티 | 특징 |
-    |---|---|
-    | T1 | 해부학적 구조 파악 |
-    | T1ce | 조영증강, 종양 경계 명확 |
-    | T2 | 부종 영역 확인 |
-    | FLAIR | 병변 감지에 민감 |
-    """)
-
-with tab3:
-    st.markdown("""
-    **모델 성능 지표**
-
-    | 지표 | 값 | 의미 |
-    |---|---|---|
-    | mAP@0.5 | 0.911 | 종양 탐지 정확도 |
-    | Precision | 0.943 | 탐지 정밀도 |
-    | Recall | 0.836 | 종양 검출률 |
-    """)
+st.caption("© 2026 Brain MRI AI Brain-Learning Project. Reference: WHO CNS5 (2021) & BraTS 2021 Dataset.")
