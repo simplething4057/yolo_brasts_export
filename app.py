@@ -36,24 +36,26 @@ if os.path.exists(sample_path):
 st.header("2. 페이지별 이용 방법")
 with st.container():
     st.markdown("""
-    - **🔍 MRI 탐지 & 분석**: MRI 사진을 업로드하여 실시간으로 종양의 위치와 신뢰도를 분석합니다. 결과는 DB에 자동 저장됩니다.
-    - **📚 학습자료**: 최신 WHO CNS5 개정 패러다임과 주요 7대 종양의 영상학적 특징을 상세히 공부합니다.
     - **📊 데이터 대시보드**: 축적된 탐지 데이터를 통해 모델의 성능을 검증하고 통계를 확인합니다.
+    - **📝 실전 판독 연습**: 가상 증례(Case Study)를 통해 직접 MRI를 판독하고 AI 및 정답과 비교 학습합니다.
     """)
 
 # 6. 빠른 이동 (하단 버튼)
 st.write("")
 st.header("3. 바로가기")
-c1, c2, c3 = st.columns(3)
+c1, c2, c3, c4 = st.columns(4)
 with c1:
-    if st.button("🔍 MRI 탐지 & 분석으로 이동", use_container_width=True):
+    if st.button("🔍 MRI 탐지 & 분석", use_container_width=True):
         st.switch_page("pages/1. MRI 탐지 & 분석.py")
 with c2:
-    if st.button("📚 학습자료로 이동", use_container_width=True):
+    if st.button("📚 학습자료", use_container_width=True):
         st.switch_page("pages/2. 학습자료.py")
 with c3:
-    if st.button("📊 데이터 대시보드로 이동", use_container_width=True):
-        st.switch_page("pages/3. 데이터 대시보드.py")
+    if st.button("📊 데이터 데시보드", use_container_width=True):
+        st.switch_page("pages/3. 데이터 데시보드.py")
+with c4:
+    if st.button("📝 실전 판독 연습", use_container_width=True):
+        st.switch_page("pages/4. 실전 판독 연습.py")
 
 st.divider()
 st.caption("© 2026 Brain MRI AI Brain-Learning Project. Reference: WHO CNS5 (2021) & BraTS 2021 Dataset.")

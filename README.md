@@ -1,82 +1,64 @@
-# 🧠 뇌 MRI 종양 탐지 및 의학지식 학습 시스템 (WHO CNS5 기반)
-> **BraTS 2021 데이터를 활용한 의료 인공지능 탐지 보조 및 최신 중추신경계 진단 표준(WHO CNS5) 학습 시스템**
+# 🏥 Brain MRI 종양 탐지 & 의학 교육 플랫폼
+
+본 프로젝트는 BraTS 2021 데이터셋과 YOLOv8 모델을 활용하여, 인공지능 기반의 뇌종양(Glioma) 탐지와 의료진/학습자를 위한 실전 판독 트레이닝 환경을 제공하는 Streamlit 애플리케이션입니다.
 
 ---
 
-## 🚀 프로젝트 개요 (Overview)
-본 프로젝트는 예비 의료인 및 AI 연구자를 위한 **'의료 AI 학습 및 탐지 보조 대시보드'**입니다. 단순히 종양을 탐지하는 것을 넘어, **2021년 개정된 최신 WHO 중추신경계 종양 분류(CNS5)** 지침에 따른 전문적인 의학 지식을 인터랙티브하게 학습할 수 있는 환경을 제공합니다.
+## 📸 주요 구동 화면 (Demonstration)
 
-- **대상**: 의과대학생, 수련의, 의료 인공지능 입문자
-- **목적**: 최신 의학 표준(WHO CNS5)에 기반한 진단 역량 강화 및 AI 탐지 프로세스 이해
+### 1. AI 종합 분석 (Box Detection & Heatmap)
+AI가 종양을 탐지한 영역(Bounding Box)과 판단의 근거가 되는 히트맵(Grad-CAM)을 동시에 제공합니다.
+![AI Analysis Demo](assets/screenshots/ai_analysis_demo.png)
 
----
-
-## ✨ 핵심 기능 (Features)
-
-### 🔍 MRI 탐지 & 분석 (F-01, F-02)
-- **YOLOv8s 엔진**: BraTS 2021 고해상도 MRI 데이터를 기반으로 학습된 실시간 탐지 모델.
-- **상세 메트릭**: 종양의 바운딩 박스(Center X, Y, W, H) 및 신뢰도 점수를 데이터 테이블 형태로 즉시 제공.
-- **시각화 분석**: 원본 영상과 탐지 결과의 병렬 비교를 통해 판독의 정확성 지원.
-
-### 📚 WHO CNS5 기반 전문 학습 가이드 (F-03, 고도화항목)
-- **진단 패러다임 변화**: 4판(2016) 대비 5판(2021)의 핵심 개정 사항(통합 진단, 분자학적 변이 등) 상세 수록.
-- **7대 주요 종양 심층 분석**: 각 질환별 증상 특징, 주요 원인 및 하위 유형별 전문 지식 제공.
-- **MRI 판독 포인트**: Dural tail, Ring enhancement 등 각 질환별 결정적 영상 지표 가이드.
-
-### 📊 데이터 데시보드 (F-06, 신규)
-- **실시간 통계**: Supabase 연동을 통한 평균 신뢰도, 검출률, 시간별 분석 트렌드 분석.
-- **모델 검증(Validation)**: 실제 의학적 정답(Ground Truth)과 AI 예측의 대조 학습 기능.
-- **데이터 로깅**: 과거 탐지 이력 추적 및 분석 품질 모니터링.
+### 2. 정석 실전 판독 트레이닝 (4-Step)
+학습자가 직접 진단하고 전문의의 정답(GT Mask) 및 모달리티 분석과 대조하는 전문 프로세스를 제공합니다.
+![Training Demo](assets/screenshots/training_demo.png)
 
 ---
 
-## ⚠️ 프로젝트 제약 사항 (Limitations)
-- **탐지 범위 제한**: 본 서비스는 BraTS 2021 데이터셋의 특성상 **신경교종(Glioma)** 관련 3가지 세부 영역(NCR, ED, ET)만 탐지 가능합니다. 
-- **기타 종양 미지원**: 학습 정보에는 수막종, 뇌하수체 종양 등 다양한 뇌종양이 포함되어 있으나, 인공지능 탐지 모델은 해당 종양군을 지원하지 않습니다.
-- **의학적 참고용**: 본 서비스는 교육 및 학습 보조 목적이며, 실제 임상 진단용으로 사용할 수 없습니다.
+## 🚀 최신 업데이트 핵심 기능
 
-### 💾 글로벌 데이터베이스 연동 (F-04)
-- **Supabase Cloud**: 탐지 이력(이미지 속성, 결과값)을 클라우드 DB에 실시간 기록하여 향후 데이터 분석의 기초 마련.
+### 1. 3D NIfTI 의료 영상 분석 지원
+- **3D Volume Visualization**: `.nii.gz` 원본 데이터를 로드하여 뇌의 모든 단면(Z-axis)을 자유롭게 탐색.
+- **Multi-Modality**: T1, T2, FLAIR, T1ce 영상을 실시간 동기화하여 비교 분석.
 
----
+### 2. 정석 4단계 실전 판독 트레이닝
+1. **MRI 분석**: 초기 육안 판독.
+2. **자가 진단**: 학습자 판단 및 뇌엽(Lobe) 위치 기록.
+3. **AI 종합 분석**: YOLOv8 탐지 결과 + **Grad-CAM 히트맵** (XAI).
+4. **정답 및 해설**: 전문의 정답(**GT Mask Overlay**) + 4-Modality 학습 리포트.
 
-## 🛠 기술 스택 (Tech Stack)
-
-- **Frontend/UI**: `Streamlit` (Interactive Dashboard)
-- **Deep Learning**: `YOLOv8s` (Ultralytics), `PyTorch`
-- **Database**: `Supabase` (PostgreSQL)
-- **External API**: WHO CNS Classification Standards (2021)
-- **Deployment**: `Streamlit Cloud`
+### 3. 설명 가능한 AI (Explainable AI)
+- **Grad-CAM Heatmap**: AI가 종양을 판단할 때 주목한 픽셀을 컬러맵으로 시각화하여 판단 근거 제시.
 
 ---
 
-## 📂 프로젝트 구조 (Project Structure)
+## 📂 프로젝트 구조
 ```text
-├── app.py                      # 메인 서비스 안내 및 랜딩 페이지
-├── pages/
-│   ├── 1. MRI 탐지 & 분석.py    # 실시간 탐지 및 분석 도구
-│   ├── 2. 학습자료.py           # WHO CNS5 기반 학습 전문 가이드
-│   └── 3. 데이터 데시보드.py    # 분석 결과 통계 및 모델 검증 (신규)
-├── utils/
-│   ├── database.py       # Supabase Client Wrapper
-│   └── detector.py       # YOLOv8 Inference Logic (Caching 적용)
-├── weights/              # 최적화된 YOLOv8 가중치 데이터
-├── assets/               # 시각화 학습용 MRI 샘플 이미지
-├── requirements.txt      # 프로젝트 의존성 관리
-└── README.md             # 프로젝트 상세 명세
+├── app.py                # 메인 페이지 (서비스 안내)
+├── pages/                # 서브 페이지
+│   ├── 4. 실전 판독 연습.py  # 3D/XAI 통합 트레이닝 (핵심)
+│   └── ...
+├── assets/
+│   ├── data/             # BraTS 2021 NIfTI 환자 폴더
+│   └── screenshots/      # 구동 화면 이미지 저장 경로
+└── requirements.txt      # 프로젝트 의존성
 ```
 
----
+## 🛠️ 설치 및 실행 방법
 
-## 📊 모델 성능 성능 (Benchmark)
+1. **가상환경 설정 및 라이브러리 설치**
+```bash
+pip install -r requirements.txt
+```
 
-| 평가지표 | 30명 (50ep) | 100명 (100ep) | 특징 |
-| :--- | :---: | :---: | :--- |
-| **mAP@0.5** | **0.911** | 0.889 | 소규모 데이터에서 높은 정밀도 |
-| **Recall** | 0.836 | **0.852** | 대규모 데이터에서 탐지 누락 방지 성능 수위 |
+2. **애플리케이션 실행**
+```bash
+streamlit run app.py
+```
 
----
-
-## 🎓 운영 정책 및 레퍼런스
-- 본 서비스의 진단 기준은 **WHO Classification of Tumors of the Central Nervous System (5th ed., 2021)**을 준수합니다.
-- 연구 근거: [Neuro-Oncology 23(8), 2021](https://academic.oup.com/neuro-oncology/article/23/8/1231/6311214)
+## 📦 주요 기술 스택
+- **Framework**: Streamlit
+- **AI Model**: YOLOv8 (Ultralytics), PyTorch
+- **Imaging**: Nibabel, OpenCV, Pillow
+- **Analysis**: XAI (Grad-CAM), Multi-modality Correlation
