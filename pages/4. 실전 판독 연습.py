@@ -14,7 +14,7 @@ st.set_page_config(page_title="통합 실전 판독 트레이닝", page_icon="�
 # 모델 초기화
 @st.cache_resource
 def get_detector():
-    return BrainTumorDetector('./weights/model_30p_ep50.pt')
+    return BrainTumorDetector('weights/model_30p_ep50.pt')
 
 detector = get_detector()
 

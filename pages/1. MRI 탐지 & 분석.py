@@ -11,7 +11,7 @@ st.set_page_config(page_title="MRI 탐지 & 분석 - 뇌 MRI", page_icon="🔍",
 # 모델 초기화
 @st.cache_resource
 def get_detector():
-    return BrainTumorDetector('./weights/model_30p_ep50.pt')
+    return BrainTumorDetector('weights/model_30p_ep50.pt')
 
 detector = get_detector()
 
