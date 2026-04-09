@@ -10,23 +10,23 @@ st.markdown("""
 MRI 판독 시 종양의 위치, 조영 증강 패턴, 주변 조직 침범 정도를 파악하는 것이 중요합니다.
 """)
 
-# [학습용 영상 매핑 - 로컬 경로 및 대체 웹 URL]
+# [학습용 영상 매핑 - URL 안정화]
 tumor_samples = {
     "신경교종 (Glioma)": {
-        "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Glioblastoma_Macro.jpg", # 예시
-        "desc": "조영제 주입 시 링 형태의 증강과 심한 주변 부종이 특징입니다."
+        "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Glioblastoma_Macro.jpg",
+        "desc": "조영제 주입 시 링 형태의 조영 증강과 중심부 괴사, 그리고 광범위한 주변부 부종이 특징입니다."
     },
     "수막종 (Meningioma)": {
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Meningioma_MRI_T1_with_contrast.jpg/600px-Meningioma_MRI_T1_with_contrast.jpg",
-        "desc": "뇌막에서 발생하는 양성 종양으로, 균일한 조영 증강과 'dural tail' 징후가 보입니다."
+        "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Meningioma_MRI_T1_with_contrast.jpg",
+        "desc": "뇌막(Dura)에서 발생하는 가장 흔한 양성 종양으로, 경계가 뚜렷하며 균일하고 강한 조영 증강을 보입니다."
     },
     "뇌하수체 종양 (Pituitary Tumor)": {
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Pituitary_adenoma_MRI.jpg/600px-Pituitary_adenoma_MRI.jpg",
-        "desc": "터키장(Sella turcica) 부근에서 발생하며 시교차 압박으로 인한 시야 결손을 유발할 수 있습니다."
+        "url": "https://upload.wikimedia.org/wikipedia/commons/f/fa/Pituitary_adenoma_MRI.jpg",
+        "desc": "안장(Sella) 부위에서 발생하며, 시교차(Optic chiasm)를 위로 압박하는 '눈사람' 모양의 성장이 관찰되기도 합니다."
     },
     "전이성 뇌종양 (Metastasis)": {
-        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Brain_Metastasis_-_MRI_-_axial_T1_with_Contrast.png/600px-Brain_Metastasis_-_MRI_-_axial_T1_with_Contrast.png",
-        "desc": "원발 암(폐, 유방 등)에서 전이되어 발생하며, 주로 회백질 경계부에서 다발성으로 관찰됩니다."
+        "url": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Brain_Metastasis_-_MRI_-_axial_T1_with_Contrast.png",
+        "desc": "원발성 암세포가 혈류를 타고 전이된 것으로, 주로 회백질-백질 경계부에서 다발성 결절 형태로 나타납니다."
     }
 }
 
@@ -39,29 +39,31 @@ with tab1:
     col1, col2 = st.columns(2)
     with col1:
         st.write("### 주요 신경교종 (Gliomas)")
-        st.write("- **Glioblastoma**, IDH-wildtype")
-        st.write("- **Astrocytoma**, IDH-mutant")
-        st.write("- **Oligodendroglioma**, IDH-mutant, 1p/19q-codeleted")
+        st.write("- **Glioblastoma**, IDH-wildtype (4등급)")
+        st.write("- **Astrocytoma**, IDH-mutant (2-4등급)")
+        st.write("- **Oligodendroglioma**, IDH-mutant (2-3등급)")
     with col2:
         st.write("### 비신경교종 및 양성 종양")
-        st.write("- **Meningioma** (수막종)")
+        st.write("- **Meningioma** (수막종, 1등급)")
         st.write("- **Pituitary Adenoma** (뇌하수체 선종)")
-        st.write("- **Schwannoma** (신경초종)")
+        st.write("- **Schwannoma** (신경초종, 1등급)")
 
 with tab2:
     st.header("2. MRI 영상 패턴 학습")
     for tumor, data in tumor_samples.items():
-        with st.expander(f"🔍 {tumor} 판독 예시"):
-            c1, c2 = st.columns([1, 1.5])
+        with st.expander(f"🔍 {tumor} 판독 예시 모니터링"):
+            c1, c2 = st.columns([1, 1])
             with c1:
+                # URL 직접 로딩 시도
                 st.image(data["url"], caption=f"{tumor} 대표 영상", use_container_width=True)
             with c2:
-                st.write(f"**진단 포인트**: {data['desc']}")
+                st.write(f"**진단 핵심 소견**: {data['desc']}")
                 st.markdown("""
-                - **T1ce**: 종양의 핵심부 확인
-                - **T2/FLAIR**: 주변부 침윤 및 부종 확인
+                - **MRI 시퀀스별 특징**:
+                  - **T1ce**: 혈관 장벽 파괴 정도 및 고신호 증강 확인
+                  - **FLAIR**: 고형 종양 주변부의 저신호/고신호 부종 여부 판정
                 """)
 
 st.divider()
-st.sidebar.markdown("### 👨‍⚕️ 판독 팁")
-st.sidebar.warning("조영 증강(Enhancement)이 강할수록 대개 악성 등급이 높은 경향이 있으나, 수막종 같은 양성 종양도 강한 증강을 보일 수 있으므로 위치와 모양을 종합적으로 판단해야 합니다.")
+st.sidebar.markdown("### 👨‍⚕️ 판독 실력을 높이는 TIP")
+st.sidebar.warning("임상 현장에서는 MRI 외에도 환자의 병력, 연령, 위치 정보를 결합하여 진단합니다. 예를 들어 다발성 결절인 경우 전이를, 뇌막에 붙은 경우 수막종을 우선 고려합니다.")

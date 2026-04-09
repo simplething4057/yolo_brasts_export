@@ -114,6 +114,7 @@ if st.session_state.quiz_step == 1:
         st.rerun()
 
 elif st.session_state.quiz_step == 2:
+    # ...생략 (기존과 동일)
     st.subheader("Step 2. 학습자 자가 진단")
     t1ce_data = load_data(modalities["T1ce"])
     c1, c2 = st.columns([1.8, 1])
@@ -127,33 +128,20 @@ elif st.session_state.quiz_step == 2:
             st.rerun()
 
 elif st.session_state.quiz_step == 3:
-    # [통합] AI 탐지 결과 + 히트맵
     st.subheader("Step 3. AI 종합 분석 (박스 탐지 & 히트맵)")
     t1ce_data = load_data(modalities["T1ce"])
     raw_slice = t1ce_data[:, :, slice_idx]
-    
-    # 1. AI 탐지 결과 (Box)
     res_img, summary = cached_predict(p_id, slice_idx, raw_slice)
-    # 2. 히트맵 생성 (Grad-CAM)
     rgb_slice = np.stack([raw_slice]*3, axis=-1)
     heatmap_res = generate_heatmap(rgb_slice, detector.model)
-    
     col_a, col_b = st.columns(2)
-    with col_a:
-        st.image(res_img, caption="AI 탐지 결과 (YOLOv8 Bounding Box)", use_container_width=True)
-        if summary["detected"]:
-            st.success(f"🤖 종양 {summary['boxes'][0]['confidence']:.1%} 확률로 탐지됨")
-        else: st.warning("🤖 특이 소견 없음")
-    with col_b:
-        st.image(heatmap_res, caption="AI 판단 근거 히트맵 (Grad-CAM)", use_container_width=True)
-        st.info("💡 빨간색 영역은 AI가 종양을 결정하는 데 결정적인 영향을 준 핵심 픽셀들입니다.")
-        
+    with col_a: st.image(res_img, caption="AI 탐지 결과 (YOLOv8)", use_container_width=True)
+    with col_b: st.image(heatmap_res, caption="AI 판단 근거 히트맵 (Grad-CAM)", use_container_width=True)
     if st.button("전문 정답(GT) 및 해설 보기 💡", use_container_width=True):
         st.session_state.quiz_step = 4
         st.rerun()
 
 elif st.session_state.quiz_step == 4:
-    # [통합] 정답 마스크 + 전문 해설 + 모달리티 비교
     st.subheader("Step 4. 전문 정답 및 최종 학습 리포트")
     t1ce_mri = load_data(modalities["T1ce"])
     seg_data = load_data(modalities["Seg"], normalize=False)
@@ -163,21 +151,31 @@ elif st.session_state.quiz_step == 4:
         gt_overlay = create_gt_overlay(t1ce_mri[:, :, slice_idx], seg_data[:, :, slice_idx])
         st.image(gt_overlay, caption="의학적 정답(Ground Truth Mask Overlay)", use_container_width=True)
     with r2:
-        st.markdown("### 👨‍⚕️ 판독 가이드")
+        st.markdown("### 👨‍⚕️ 전문의 판독 해설")
         if np.sum(seg_data[:,:,slice_idx]) > 0:
             st.error("🚩 최종 판정: **종양 검출됨(Positive)**")
-            st.write("실제 전문의가 마킹한 정답 구역(빨간색)과 본인이 Step 2에서 마킹한 위치를 대조해 보세요.")
+            st.markdown("""
+            **영상학적 상세 소견**:
+            - **T1ce**: 조영 증강이 뚜렷한 종양의 고형 성분이 확인됩니다.
+            - **해부학적 소견**: 인접한 뇌 조직을 압박하거나 침윤하고 있는 양상이 보입니다.
+            - **학습 포인트**: AI 탐지 박스와 정답 마스크가 일치하는지, 본인이 놓친 미세한 증강 영역은 없는지 대조하세요.
+            """)
         else:
             st.success("🚩 최종 판정: **정상(Negative)**")
+            st.markdown("**영상학적 상세 소견**: 해당 슬라이스에서는 유의미한 조영 증강이나 이상 병변이 관찰되지 않습니다.")
         
         st.divider()
         st.write("**모달리티간 대조 분석**")
         sc1, sc2 = st.columns(2)
-        with sc1: st.image(load_data(modalities["FLAIR"])[:,:,slice_idx], caption="FLAIR (에데마 확인)", use_container_width=True)
-        with sc2: st.image(load_data(modalities["T2"])[:,:,slice_idx], caption="T2 (뇌척수액 대조)", use_container_width=True)
+        with sc1: st.image(load_data(modalities["FLAIR"])[:,:,slice_idx], caption="FLAIR (부종 및 침윤 범위)", use_container_width=True)
+        with sc2: st.image(load_data(modalities["T2"])[:,:,slice_idx], caption="T2 (뇌척수액 대조 확인)", use_container_width=True)
 
     st.markdown("---")
-    st.write("🔍 **종합 교육**: T1ce에서의 조영 증강은 종양의 핵심을, FLAIR의 고신호 강도는 종양 주변부 침윤 및 부종을 판독하는 데 핵심적인 단서를 제공합니다.")
+    st.markdown("""
+    ### 📚 오늘의 케이스 종합 정리
+    - **T1ce**에서 밝게 나타나는 부분은 혈관-뇌 장벽(BBB)이 파괴된 활동성 종양 부위입니다.
+    - **FLAIR**의 고신호 강도는 종양 세포의 침윤이나 부종(Edema)을 나타냅니다. 고등급 신경교종일수록 이 부종 범위가 넓게 나타나는 경향이 있습니다.
+    """)
     
     if st.button("학습 종료 및 무작위 증례 변경 🔄", use_container_width=True):
         reset_case()
