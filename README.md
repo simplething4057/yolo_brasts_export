@@ -7,58 +7,78 @@
 ## 📸 주요 구동 화면 (Demonstration)
 
 ### 1. AI 종합 분석 (Box Detection & Heatmap)
-AI가 종양을 탐지한 영역(Bounding Box)과 판단의 근거가 되는 히트맵(Grad-CAM)을 동시에 제공합니다.
+AI가 종양을 탐지한 영역(Bounding Box)과 판단의 근거가 되는 히트맵(Grad-CAM)을 동시에 제공하여 신뢰할 수 있는 판독을 지원합니다.
 ![AI Analysis Demo](assets/screenshots/ai_analysis_demo.png)
 
 ### 2. 정석 실전 판독 트레이닝 (4-Step)
-학습자가 직접 진단하고 전문의의 정답(GT Mask) 및 모달리티 분석과 대조하는 전문 프로세스를 제공합니다.
+의료 교육 표준에 따른 판독 프로세스(Raw MRI -> Diagnosis -> AI Comparison -> GT Mask/Explanation)를 제공합니다.
 ![Training Demo](assets/screenshots/training_demo.png)
 
 ---
 
-## 🚀 최신 업데이트 핵심 기능
+## 🌐 배포 가이드 (Deployment)
 
-### 1. 3D NIfTI 의료 영상 분석 지원
-- **3D Volume Visualization**: `.nii.gz` 원본 데이터를 로드하여 뇌의 모든 단면(Z-axis)을 자유롭게 탐색.
-- **Multi-Modality**: T1, T2, FLAIR, T1ce 영상을 실시간 동기화하여 비교 분석.
+### 1. Streamlit Cloud 배포
+본 앱은 Streamlit Cloud를 통해 배포 가능합니다. 배포 시 **Dashboard > Settings > Secrets**에 아래 정보를 반드시 입력해야 합니다.
 
-### 2. 정석 4단계 실전 판독 트레이닝
-1. **MRI 분석**: 초기 육안 판독.
-2. **자가 진단**: 학습자 판단 및 뇌엽(Lobe) 위치 기록.
-3. **AI 종합 분석**: YOLOv8 탐지 결과 + **Grad-CAM 히트맵** (XAI).
-4. **정답 및 해설**: 전문의 정답(**GT Mask Overlay**) + 4-Modality 학습 리포트.
+```toml
+# Streamlit Secrets (Secrets.toml 내용 복사)
+SUPABASE_URL = "YOUR_SUPABASE_URL"
+SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY"
+```
 
-### 3. 설명 가능한 AI (Explainable AI)
-- **Grad-CAM Heatmap**: AI가 종양을 판단할 때 주목한 픽셀을 컬러맵으로 시각화하여 판단 근거 제시.
+### 2. 환경 변수 관리 (.env)
+로컬 실행 시에는 프로젝트 루트 폴더에 `.env` 파일을 생성하고 Supabase 정보를 입력하세요.
+- `SUPABASE_URL`: Supabase 프로젝트 URL
+- `SUPABASE_KEY`: API Key (Anon/Public)
+
+### 3. 대용량 파일 관리 (Git LFS)
+YOLO 가중치 파일(`.pt`)과 NIfTI 데이터셋은 용량이 크므로, 원활한 Push를 위해 Git LFS(Large File Storage) 사용을 권장합니다.
+
+---
+
+## 🚀 핵심 기능 상세
+
+### 🔬 3D NIfTI 의료 영상 분석
+- **3D Volume Visualization**: `.nii.gz` 원본 데이터를 로드하여 뇌의 모든 단면(Z-axis) 탐색.
+- **Multi-Modality**: T1, T2, FLAIR, T1ce 영상을 실시간으로 대조하며 종양과 부종의 범위를 판별.
+
+### 🧬 설명 가능한 AI (Explainable AI)
+- **Grad-CAM Heatmap**: AI가 종양을 결정하는 데 결정적인 영향을 준 핵심 픽셀을 컬러맵으로 시각화하여 의료적 판단의 근거를 제시.
 
 ---
 
 ## 📂 프로젝트 구조
 ```text
-├── app.py                # 메인 페이지 (서비스 안내)
-├── pages/                # 서브 페이지
-│   ├── 4. 실전 판독 연습.py  # 3D/XAI 통합 트레이닝 (핵심)
-│   └── ...
+├── app.py                # 메인 페이지 (네비게이션 및 서비스 안내)
+├── pages/                # 서브 페이지 (탐지, 대시보드, 트레이닝 등)
+├── weights/              # YOLOv8 학습 모델 가중치 (.pt)
 ├── assets/
-│   ├── data/             # BraTS 2021 NIfTI 환자 폴더
-│   └── screenshots/      # 구동 화면 이미지 저장 경로
+│   ├── data/             # BraTS 2021 NIfTI 환자별 데이터 (000~100)
+│   └── screenshots/      # README용 이미지
+├── utils/                # AI 탐지기 및 데이터 처리 유틸리티
 └── requirements.txt      # 프로젝트 의존성
 ```
 
-## 🛠️ 설치 및 실행 방법
+## 📚 데이터 출처 및 인용 (Citation)
+본 프로젝트는 **BraTS 2021 (RSNA-ASNR-MICCAI Brain Tumor Segmentation challenge)** 데이터를 공식적으로 활용합니다.
+- Baid, U., et al. "The RSNA-ASNR-MICCAI BraTS 2021 Benchmark on Brain Tumor Segmentation." arXiv preprint arXiv:2107.02314 (2021).
 
-1. **가상환경 설정 및 라이브러리 설치**
+---
+
+## 🛠️ 개발 환경 구축
 ```bash
+# 가상환경 생성 및 활성화
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 라이브러리 설치
 pip install -r requirements.txt
-```
 
-2. **애플리케이션 실행**
-```bash
+# 웹 앱 실행
 streamlit run app.py
 ```
 
-## 📦 주요 기술 스택
-- **Framework**: Streamlit
-- **AI Model**: YOLOv8 (Ultralytics), PyTorch
-- **Imaging**: Nibabel, OpenCV, Pillow
-- **Analysis**: XAI (Grad-CAM), Multi-modality Correlation
+## ⚖️ License & Disclaimer
+- **License**: MIT License
+- **Disclaimer**: 본 애플리케이션은 의학 교육 및 AI 연구 보조용으로 개발되었습니다. 실제 임상 진단 시에는 반드시 전문의의 판단을 우선시해야 합니다.
