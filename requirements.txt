@@ -4,6 +4,12 @@ supabase
 pillow
 numpy
 pandas
+matplotlib
+scipy
+seaborn
+PyYAML
+tqdm
+scikit-learn
 torch
 torchvision
 python-dotenv
