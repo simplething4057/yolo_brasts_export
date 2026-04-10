@@ -5,7 +5,7 @@
 ---
 
 ## 🔗 서비스 바로가기
-**[배포 링크: yolo-brats-export.streamlit.app](https://supabase.com/dashboard/project/fdrghtpwdegbizajelct/settings/general)**
+**[배포 링크: yolo-brats-export.streamlit.app](https://tmdse6mjmkm7n7ahyqxwhf.streamlit.app/)**
 
 ---
 
