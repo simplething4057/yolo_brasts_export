@@ -3,6 +3,7 @@ ultralytics
 supabase
 pillow
 numpy
+pandas
 torch
 torchvision
 python-dotenv
